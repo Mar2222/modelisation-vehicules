@@ -6,11 +6,6 @@ Created on Wed May 29 10:45:01 2019
 """
 import pandas as pd
 import numpy as np
-
-import environment
-import lane_change
-import state
-
 from scipy import arange  
 
 tp=0.1
@@ -70,7 +65,7 @@ a_max=2
 #test avec le changement de voie, route infinie avec 2 voies, avec 2 véhicules
 vehicles = {'vehicle':[1,2,3,4,5,6,7,8], 'classe vehicule':['HD','HD','AV','AV','HD','HD','HD','AV'],'type vehicule':['VL','VL','VL','VL','VL','PL','VL','VL'],'aggressivity 0':[50,50,50,50,50,50,50,50], 'aggressivity':[50,50,50,50,50,50,50,50], 'reaction time':[1,1,0.5,0.5,1,1,1,0.5], 'courtesy':[50,50,50,50,50,50,50,50], 'respect code de la route':[50,50,50,50,50,50,50,50], 'road': [1, 1, 1, 1, 1, 1, 1, 1], 'lane': [1, 2, 1, 2, 1, 2, 2, 2],'road turn':[3,3,3,3,3,3,3,3],'lane turn':[1,1,1,1,1,1,1,1], 'position turn':[1,1,1,1,1,1,1,1]}
 vehicles=pd.DataFrame(data=vehicles)
-#vitesse limite=110km/h <=> 30m/s
+#vitesse limite=30m/s
 Network={'road':[1,1],'lane':[1,2],'vitesse limite':[30,30]}
 Network=pd.DataFrame(data=Network)
 trajectories0={'vehicle':[1], 'time':[0], 'acceleration':[0], 'vitesse':[25], 'position':[0], 'road':[1], 'lane':[1] }

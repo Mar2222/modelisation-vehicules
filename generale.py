@@ -7,6 +7,13 @@ import environment
 import lane_change
 import state
 
+"""
+fonction permettant de déterminer l'évolution d'un véhicule dans un réseau 
+
+ENTREES:
+    ego_vehicle (DataFrame): description du véhicule étudié (contient: 
+"""
+
 def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajectories) :   
     
     t=t_simu_deb

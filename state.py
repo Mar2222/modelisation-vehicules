@@ -8,7 +8,11 @@ import numpy as np
 import pandas as pd
 
 """
-les variables d'entrées sont: 
+fonction permettant de calculer l'accélération d'un véhicule d'après la loi de poursuite HDM
+
+ENTREES :
+  ego_vehicle (DataFrame): description du véhicule considéré (ego_vehicle) (contient: , leaders, Network, trajectories, t0, Ag
+
 ego_vehicle:contient la vitesse en t-Tr, la position en t-Tr (longitudinale dans sa voie), la classe du véhicule (autonome ou pas),
 l'agressivité du véhicule,... 
 Network : décrit les voies et routes avec les vitesses max autorisées
@@ -20,27 +24,33 @@ les paramères sont:
   les para de HDM dépendant du véhicule: b=comfortable deceleration (peut-être les mêmes pour tous...),T=time headway,
     s0=minimum gap
 """
-#pour l'instant pas de projection prise en compte
 
-# renvoie l'accélération calculée par le HDM 
 
-def HDM(ego_vehicle, leaders, Network, trajectories, t, tr_bis):
+def HDM(ego_vehicle, leaders, Network, trajectories, t0, Ag):
     # paramètres
     delta=4
-    s0=2
-    a=2.2
+    s0=2 #minimum gap
+    a_max=2.2 #accélération max
     c=0
-    T=2
-    b=2
-    #Ag= ego_vehicle.iloc[0]['aggressivity']
-    #s0=s0*(1+0.1*(Ag-50)/50) # revoir les paramètres propres...
+    T=2 # time headway
+    b=2 # comfortable deceleration
+    
+    #on cherche les états du véhicules et de la route
     v0=Network.loc[Network['road']== ego_vehicle.iloc[0]['road']] # on trouve la limitation de vitesse sur la route sur laquelle se trouve  la voiture
     v0=v0.iloc[0]['vitesse limite']
-    ve=trajectories[(trajectories['vehicle']== ego_vehicle.iloc[0]['vehicle'])&(trajectories['time']==round(t-tr_bis,1))]
-    ve=ve.iloc[0]['vitesse'] # on récupère la vitesse en t-Tr (Tr est celui de ego_vehicle)
-    xe=trajectories[(trajectories['vehicle']==ego_vehicle.iloc[0]['vehicle'])&(trajectories['time']==round(t-tr_bis,1))]
+    ve=trajectories[(trajectories['vehicle']== ego_vehicle.iloc[0]['vehicle'])&(trajectories['time']==round(t0,1))]
+    ve=ve.iloc[0]['vitesse'] # on récupère la vitesse en t0 (=t-Tr par exemple)
+    xe=trajectories[(trajectories['vehicle']==ego_vehicle.iloc[0]['vehicle'])&(trajectories['time']==round(t0,1))]
     xe=xe.iloc[0]['position']
-    a_free= a*(1-(ve/v0)**delta)
+    
+    #impact de l'aggressivité sur les paramètres
+    s0=s0*(1+0.1*(Ag-50)/50) 
+    v0=v0*(1+0.25*(Ag-50)/50)
+    a_max=a_max*(1+0.1*(Ag-50)/50)
+    T=T*(1+0.1*(Ag-50)/50)
+    
+    #calcul de l'accélération idéale en free flow
+    a_free= a_max*(1-(ve/v0)**delta)
     a_int=0
     if leaders is None:
         print('leaders is none')
@@ -48,7 +58,7 @@ def HDM(ego_vehicle, leaders, Network, trajectories, t, tr_bis):
         return a_mic
     else:
         if len(leaders)==0: # si il n'y a pas de véhicule leader (i.e. free flow)
-            a_mic=a*(1-(ve/v0)**delta)
+            a_mic=a_free
             return a_mic
 
         else:  
@@ -56,13 +66,12 @@ def HDM(ego_vehicle, leaders, Network, trajectories, t, tr_bis):
                 c=c+1/((i+1)**2)
             c=1/c
             for j in range(0,len(leaders)):
-                vl=trajectories[(trajectories['vehicle']==leaders[j])&(trajectories['time']==round(t-tr_bis,1))]
+                vl=trajectories[(trajectories['vehicle']==leaders[j])&(trajectories['time']==round(t0,1))]
                 vl=vl.iloc[0]['vitesse']
-                xl=trajectories[(trajectories['vehicle']==leaders[j])&(trajectories['time']==round(t-tr_bis,1))]
+                xl=trajectories[(trajectories['vehicle']==leaders[j])&(trajectories['time']==round(t0,1))]
                 xl=xl.iloc[0]['position']
-                s1=s0 + max(0,ve*T+ve*(vl-ve)/(2*(a*b)**0.5))
-                a_int=a_int - a*(s1/abs(xe-xl))**2
-    
+                s1=s0 + max(0,ve*T+ve*(vl-ve)/(2*(a_max*b)**0.5))
+                a_int=a_int - a_max*(s1/abs(xe-xl))**2
             a_mic=a_free + c*a_int
             return a_mic
 
@@ -74,7 +83,7 @@ def vitesse(a_prece,v_prece,tp):
     return a_prece*tp+v_prece
 
 """
-fonction basique de vitesse où on suppose l'accélération constante entre deux pas de temps 
+fonction basique de position où on suppose la vitesse constante entre deux pas de temps 
 """
 
 def position(v_prece,x_prece,tp):

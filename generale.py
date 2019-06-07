@@ -16,7 +16,11 @@ ENTREES:
     Network (DataFrame): description du réseau (contient: 'road', 'lane', 'vitesse limite')
     vehicles (DataFrame): description de tous les véhicules dans le réseau (contient la même chose que ego_vehicle)
     t_simu_deb/t_simu_fin/tp (float): temps de début/fin de simulation et pas de temps
-    trajectories (DataFrame):
+    trajectories (DataFrame): donne les états des autres véhicules à chaque instant et de ego_vehicle pour l'initialistion (quelques pas de temps)
+                    (contient: 'vehicle','time','position','vitesse','acceleration'road','lane')
+SORTIE:
+trajectories (DataFrame): donne les états de tous les véhicules à chaque instant
+
 """
 
 def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajectories) :   
@@ -210,7 +214,7 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
         
         t=t+tp #on passe au pas de temps suivant
         t=round(t,1)
-        # on met à jour la table des attributs
+        # on met à jour la table trajectories
         trajectories = pd.DataFrame(np.array([[ego_vehicle.iloc[0]['vehicle'],t, a_fin, v, x, ego_vehicle.iloc[0]['road'], lanea]]),columns=["vehicle", "time", "acceleration", "vitesse", "position", "road", "lane" ]).append(trajectories, ignore_index=True)
 
     return trajectories

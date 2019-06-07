@@ -11,7 +11,12 @@ import state
 fonction permettant de déterminer l'évolution d'un véhicule dans un réseau 
 
 ENTREES:
-    ego_vehicle (DataFrame): description du véhicule étudié (contient: 
+    ego_vehicle (DataFrame): description du véhicule étudié (contient: 'vehicle', 'classe vehicule','type vehicule','aggressivity 0',
+                    'reaction time', 'courtesy', 'respect code de la route', 'road','lane','road turn','lane turn','position turn')
+    Network (DataFrame): description du réseau (contient: 'road', 'lane', 'vitesse limite')
+    vehicles (DataFrame): description de tous les véhicules dans le réseau (contient la même chose que ego_vehicle)
+    t_simu_deb/t_simu_fin/tp (float): temps de début/fin de simulation et pas de temps
+    trajectories (DataFrame):
 """
 
 def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajectories) :   

@@ -91,13 +91,13 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
             Possible_lane=[]
             sc=[]
             # on regarde tout d'abord si c'est sûr de rester dans la voie actuelle
-            safe_stay=lane_change.safety_criterion(ego_vehicle.iloc[0]['aggressivity'],Ae[-1], Af_avec[-1])
+            safe_stay=lane_change.safety_criterion(Ag,Ae[-1], Af_avec[-1])
 
 
             if cv=='HD' or (cv=='AV' and safe_stay==True): #si on a un HD ou on a un AV pour lequel le critère de sécurité est respecté si on reste dans la même voie:
                 # on va juste regarder le critère de sécurité des autres voies 
                 for j in range(len(A)-1):
-                    safe=lane_change.safety_criterion(ego_vehicle.iloc[0]['aggressivity'],Ae[j],Af_avec[j])
+                    safe=lane_change.safety_criterion(Ag,Ae[j],Af_avec[j])
          
                     if safe==True : # si c'est pas dangereux d'aller dans la voie j, on rajoute cette voie dans les voies possibles
                         Possible_lane.append(A[j])
@@ -109,7 +109,7 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
             
             else: # si le véhicule est autonome et qu'il ne peut pas rester dans sa voie, il faut comparer les dangers des autres voies à la voie actuelle
                 for i in range(len(A)-1):
-                    safe=lane_change.safety_criterion(ego_vehicle.iloc[0]['aggressivity'],Ae[i],Af_avec[i])
+                    safe=lane_change.safety_criterion(Ag,Ae[i],Af_avec[i])
                     if safe== True:
                         Possible_lane.append(A[i])
                     else:
@@ -162,7 +162,7 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
                         tv2=veh2.iloc[0]['type vehicule']
                         
                     ### c'est ici qu'on calcule enfin les utilités marginales    
-                    O=lane_change.utility_overtaking(xl1,xl2,lane,lane2,x_prece, R) #utilité marginale due aux règles por doubler
+                    O=lane_change.utility_overtaking(xl1,xl2,lane,lane2,x_prece, R) #utilité marginale due aux règles pour doubler
                     T=lane_change.utility_truck(tv1,tv2, cv) #utilité marginale due à la présence de camion devant ego_vehicle
                     C=lane_change.utility_courtesy(Af_sans[k],Af_avec[k],Af_sans[-1], Af_avec[-1], ego_vehicle.iloc[0]['courtesy']) #U M due au fait que les conducteurs ne veulent pas forcément trop impacter le traffic
                     Tu=lane_change.utility_turn(x_prece, ego_vehicle.iloc[0]['position turn'],lane, ego_vehicle.iloc[0]['lane turn'], Possible_lane[k], ego_vehicle.iloc[0]['road turn'], road, cv, v_prece) # U M due à l'approche d'un tournant obligatoire
@@ -172,7 +172,7 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
                 U.append(0) # il faut rajouter l'utilité marginale pour rester dans la voie, qui est nulle
                 rang_max=U.index(max(U))#parmi les choix de voies possibles, on choisit celle dont l'utilité marginale est maximale
                 lanea=Possible_lane[rang_max] # on attribue la nouvelle voie 
-                a=Ae[rang_max] # on a la nouvelle accélération
+                a=Ae[rang_max] # on a la nouvelle accélération (calculée précédemment)
                 
        
                 

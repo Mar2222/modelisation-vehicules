@@ -103,10 +103,9 @@ SORTIE :
     leaders (list): liste des véhicules leaders d ego_vehicle dans la voie considérée
 """
 
-#en ne considérant que t je me retrouve avec mon ego_véhicule dans les véhicules leaders (il est son propre leader) 
+
 def leading_vehicles(xv, road, lane, cv, vehicles, trajectories,t):
     
-
     Dh= 200 
     Da= 200 
     nHD= 3

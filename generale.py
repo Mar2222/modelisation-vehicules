@@ -32,8 +32,7 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
     
     while t<t_simu_fin:
         
-        t=round(t,1)
-        print(t)
+        t=round(t,1) # étape obligatoire parce que python ne parvenait pas à trouver t dans les dataframes à cause de la façon dont il stock les nombres
         
 ###### recherche des états (position, vitesse, accélération) précédents (en t-tp) de ego_vehicle    
 

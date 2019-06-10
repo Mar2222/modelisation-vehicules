@@ -188,11 +188,12 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
                 rang_max=U.index(max(U))#parmi les choix de voies possibles, on choisit celle dont l'utilité marginale est maximale
                 lanea=Possible_lane[rang_max] # on attribue la nouvelle voie 
                 a=Ae[rang_max] # on a la nouvelle accélération (calculée précédemment)
+
+###### une fois qu'on a la nouvelle voie, on majore l'acceleration par l'impact du seuil de perception (HD n'est pas capable de percevoir un changement infime dans l'accélération)                
+       a_fin=state.perception_threshold(a_prece,a)
                 
-       
-                
-####### une fois qu'on a la nouvelle voie et la nouvelle accélération, on ajoute du bruit à l'accélération (dû à l'erreur de contrôle de la part de HD)
-        a_fin=state.a_bruit(a,cv)
+####### on ajoute ensuite du bruit à l'accélération (dû à l'erreur de contrôle de la part de HD)
+        a_fin=state.a_bruit(a_fin,cv)
         a_fin=a
         
 ####### on majore cette nouvelle accélération par l'accélération max du véhicule        
@@ -201,7 +202,7 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
         if a_fin<-a_max:
             a_fin=-a_max
 
-###### on majore aussi par le jerk
+###### on majore aussi par le jerk (qui représente la différence max d'accélération entre deux pas de temps)
         J=1.5*tp
         if abs(a_fin-a_prece)>J:
             a_fin=a_prece + np.sign(a_fin-a_prece)*J

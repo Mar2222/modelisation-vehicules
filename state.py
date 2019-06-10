@@ -11,9 +11,9 @@ import pandas as pd
 fonction permettant de calculer l'accélération d'un véhicule d'après la loi de poursuite HDM
 
 ENTREES :
-  ego_vehicle (DataFrame): description du véhicule considéré (ego_vehicle) (contient: (contient:'vehicle', 'classe vehicule',
-             'type vehicule','aggressivity 0','reaction time', 'courtesy', 'respect code de la route', 'road', 
-             'lane','road turn','lane turn','position turn')
+  ego_vehicle (DataFrame): description du véhicule considéré (ego_vehicle) (contient:'vehicle', 'classe vehicule','type vehicule',
+            'aggressivity 0','reaction time', 'courtesy', 'respect code de la route', 'road', 'lane','road turn','lane turn',
+            'position turn')
   leaders (liste) : liste des ID des véhicules leaders de ego_vehicle
   Network (DataFrame) : description du réseau (contient: 'road','lane','vitesse limite')
   trajectories (DataFrame) : donne les états de tous les véhicules à chaque instant (contient: 'vehicle','time','position'
@@ -103,11 +103,12 @@ fonction donnant la nouvelle accélération en considérant le seuil de percepti
 ENTREES :
   a_precedent (float): l'accélération que le véhicule avait au pas de temps précédent
   a_mic (float): l'accélération calculée par la loi de car-following pour le véhicule
+  cv (string): classe du véhicule
 
 PARAMETRES : at= seuil de perception
 """
 
-def perception_threshold(a_precedent, a_mic):
+def perception_threshold(a_precedent, a_mic, cv):
     at=0.1
     if cv is 'HD':
         if abs(a_precedent-a_mic)>at: #si on dépasse le seuil fixé

@@ -109,8 +109,11 @@ PARAMETRES : at= seuil de perception
 
 def perception_threshold(a_precedent, a_mic):
     at=0.1
-    if abs(a_precedent-a_mic)>at: #si on dépasse le seuil fixé
-        return a_mic
+    if cv is 'HD':
+        if abs(a_precedent-a_mic)>at: #si on dépasse le seuil fixé
+            return a_mic
+        else:
+            return a_precedent
     else:
         return a_precedent
 

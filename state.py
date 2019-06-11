@@ -30,14 +30,14 @@ PARAMETRES:
 
 def HDM(ego_vehicle, leaders, Network, trajectories, t0, Ag):
     # innitialisation des paramètres
-    delta=4
-    s0=2 #minimum gap
+    delta=4 #parametre de la loi HDM
+    s0=2 + 5 #minimum gap bumper to bumper + length of the vehicles
     a_max=2.2 #accélération max
     c=0
     T=2 # time headway
     b=2 # comfortable deceleration
     
-    #on cherche les états du véhicules et de la route
+    #on cherche les états du véhicule et de la route
     v0=Network.loc[Network['road']== ego_vehicle.iloc[0]['road']] # on trouve la limitation de vitesse sur la route sur laquelle se trouve  la voiture
     v0=v0.iloc[0]['vitesse limite']
     ve=trajectories[(trajectories['vehicle']== ego_vehicle.iloc[0]['vehicle'])&(trajectories['time']==round(t0,1))]
@@ -46,10 +46,10 @@ def HDM(ego_vehicle, leaders, Network, trajectories, t0, Ag):
     xe=xe.iloc[0]['position']
     
     #impact de l'aggressivité sur les paramètres
-    s0=s0*(1+0.1*(Ag-50)/50) 
+    s0=s0*(1-0.2*(Ag-50)/50) 
     v0=v0*(1+0.25*(Ag-50)/50)
-    a_max=a_max*(1+0.1*(Ag-50)/50)
-    T=T*(1+0.1*(Ag-50)/50)
+    a_max=a_max*(1+0.25*(Ag-50)/50)
+    T=T*(1-0.2*(Ag-50)/50)
     
     #calcul de l'accélération idéale en free flow
     a_free= a_max*(1-(ve/v0)**delta)
@@ -70,7 +70,7 @@ def HDM(ego_vehicle, leaders, Network, trajectories, t0, Ag):
         xl=trajectories[(trajectories['vehicle']==leaders[j])&(trajectories['time']==round(t0,1))]
         xl=xl.iloc[0]['position']
         # on calcule l'accélération due à la présence de chaque véhicule leader considéré
-        s1=s0 + max(0,ve*T+ve*(vl-ve)/(2*(a_max*b)**0.5))
+        s1=s0 + max(0,ve*T+ve*(ve-vl)/(2*(a_max*b)**0.5))
         a_int=a_int - a_max*(s1/abs(xe-xl))**2
       a_mic=a_free + c*a_int
       return a_mic
@@ -109,7 +109,7 @@ PARAMETRES : at= seuil de perception
 """
 
 def perception_threshold(a_precedent, a_mic, cv):
-    at=0.1
+    at=0.09 
     if cv is 'HD':
         if abs(a_precedent-a_mic)>at: #si on dépasse le seuil fixé
             return a_mic
@@ -135,8 +135,7 @@ def a_bruit(a,cv):
     if cv is 'AV' or cv is 'CAV':
         return a
     else:
-        a_b=0.1*np.random.randn(1) #nombre aléatoire de loi normale centrée réduite 
-        #(choisir autre distribution aléatoire là ça impacte trop)
-        a=(a+1)*a_b[0]
+        a_b=0.05*np.random.randn(1) #nombre aléatoire de loi normale centrée réduite 
+        a=a*(a_b[0]+1)
         return a
     

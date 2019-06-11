@@ -43,13 +43,13 @@ SORTIES:
 """
 
 def utility_overtaking(xl1, xl2, l1, l2, xv, R):
-    cste=0.01
+    cste=0.2
     if l1<l2:    # si la voie considérée est à droite de la voie actuelle
         if xl1-xv < 100 : # si il y a un véhicule proche sur la voie actuelle, il ne faut pas le doubler par la droite
-            O=cste*(99-R)/50
+            O=cste*R/50
         if xl1-xv>100 and xl2-xv>200 : # si il n'y a pas de véhicule proche sur la voie actuelle et qu'il n'y a pas de véhicue à droite,
             #il faut se rabattre
-            O=-cste*(99-R)/50
+            O=-cste*R/50
         else :
             O=0
     else: #si la voie considérée est à gauche de la voie actuelle
@@ -75,7 +75,7 @@ SORTIE:
 
 def utility_truck(leading_yv, leading_ye, cv):
     cste=0.1
-    if cv== 0: # ce qui correspond à un conducteur humain
+    if cv is 'HD': 
         if leading_yv is not 'VL' and leading_ye is 'VL':
             c= -1
         if leading_ye is not 'VL' and leading_yv is 'VL':
@@ -108,12 +108,12 @@ on suppose que les voies sont notées par ordre croissant (de gauche à droite)
 
 
 def utility_turn(xv, xt, lv, lt, le, rt,rv, cv, v):
-    Tth = 10 
-    Tta = 20
-    cste= 0.1
-    if rt==rv:
-        if cv is 'AV' and (xv-xt)/v<=Tta or cv is 'HD' and (xv-xt)/v<=Tth :
-            if abs(lv-lt)<abs(le-lt):
+    Tth = 7 
+    Tta = 10
+    cste= 100 #il faut que l'utilité de l'approche du tournant soit la plus élevée
+    if rt==rv: # si la route sur laquelle se trouve le tournant est la route où se trouve le véhicule 
+        if cv is 'AV' and (xv-xt)/v<=Tta or cv is 'HD' and (xv-xt)/v<=Tth : #si le véhicule se trouve dans la zone où il a "conscience" du tournant
+            if abs(lv-lt)<abs(le-lt): #si changer de voie fait se rapprocher de la voie désirée
                 d=1
             else :
                 d= -1
@@ -139,15 +139,14 @@ ENTREES:
     r/rt (floats) : routes où se trouve le véhicule/le tournant 
 
 PARAMETRES:
-    Tta/Tth (float): temps restant à partir duquel human driver/ autonomous vehicle commence à considérer le tournant
+    Tth (float): temps restant à partir duquel human driver vehicle commence à considérer le tournant
 """
 
 
 def aggressivity(Ag0, cv, xv, r, xt, rt, v):
-    Tth = 10 
-    Tta = 20
+    Tth = 7
     if r==rt:
-        if cv is 'AV' and (xv-xt)/v<=Tta or cv is 'HD' and (xv-xt)/v<=Tth :
+        if cv is 'HD' and (xv-xt)/v<=Tth :
             Ag= Ag0 + (99-Ag0)/(2*abs(xt-xv)+1)
         else :
             Ag= Ag0

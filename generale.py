@@ -27,8 +27,9 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
     
     t=t_simu_deb
     tr_bis= (ego_vehicle.iloc[0]['reaction time']//tp)*tp #pour avoir un nombre entier de pas de temps dans tr_bis
-    a_max=2 
-    mAg=50 # aggressivité moyenne des véhicules , c'est l'aggressivité que les condcteurs attribuent aux autres véhicules? (cf af_sans et af_avec)
+    mAg=50 # aggressivité moyenne des véhicules , c'est l'aggressivité que les condcteurs attribuent aux autres véhicules(cf af_sans et af_avec)
+    J=1.5*tp #jerk qui représente la différence d'accélération max entre deux pas de temps
+    
     
     while t<t_simu_fin:
         
@@ -195,14 +196,7 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
 ####### on ajoute ensuite du bruit à l'accélération (dû à l'erreur de contrôle de la part de HD)
         a_fin=state.a_bruit(a,cv)
         
-####### on majore cette nouvelle accélération par l'accélération max du véhicule        
-        if a_fin>a_max:
-            a_fin=a_max
-        if a_fin<-a_max:
-            a_fin=-a_max
-
-###### on majore aussi par le jerk (qui représente la différence max d'accélération entre deux pas de temps)
-        J=1.5*tp
+###### on majore la nouvelle accélération par le jerk 
         if abs(a_fin-a_prece)>J:
             a_fin=a_prece + np.sign(a_fin-a_prece)*J
         

@@ -20,7 +20,7 @@ SORTIE :
 """
 
 def utility_courtesy(a_f2_new, a_f2_current, a_f_new, a_f_current, p):
-    I=p*(a_f2_new - a_f2_current + a_f_new - a_f_current)
+    I=p*(a_f2_new - a_f2_current + a_f_new - a_f_current)/100
     return I
 
 

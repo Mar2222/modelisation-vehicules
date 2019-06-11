@@ -95,8 +95,8 @@ ENTREES:
     t (float): instant considéré
 
 PARAMETRES :
-    Dh: distance jusqu'à laquelle le véhicule autonome perçoit un véhicule leader (peut-être à faire dépendant de la vitesse)
-    Da: distance jusqu'à laquelle le conducteur humain perçoit un véhicule leader (peut-être à faire dépendant de la vitesse)
+    Da: distance jusqu'à laquelle le véhicule autonome perçoit un véhicule leader 
+    Dh: distance jusqu'à laquelle le conducteur humain perçoit/prend en compte un véhicule leader 
     nHD: nombre max de véhicules considérés par un conducteur humain
 
 SORTIE :
@@ -106,8 +106,8 @@ SORTIE :
 
 def leading_vehicles(xv, road, lane, cv, vehicles, trajectories,t):
     
-    Dh= 200 
-    Da= 200 
+    Dh= 200 # peut-être à considérer comme dépendant de la vitesse du véhicule
+    Da= 200 # constante équivalent à la portée de la caméra/des capteurs du véhicule autonome
     nHD= 3
     
     leaders1=trajectories[(trajectories['road']==road)&(trajectories['lane']==lane)&(trajectories['time']==round(t,1))]
@@ -143,9 +143,7 @@ def leading_vehicles(xv, road, lane, cv, vehicles, trajectories,t):
             leaders.append(leads2.iloc[0]['vehicle'])
             leaders.append(leads3.iloc[0]['vehicle'])
             leaders.append(leads4.iloc[0]['vehicle'])
-          
-        
-    cv='AV'    
+             
     if cv is 'AV':
         leaders=[]
         leads=leaders1.loc[leaders1['position']>xv]

@@ -45,6 +45,7 @@ La loi de poursuite HDM utilise les états (position, vitesse) des véhicules (e
 Une fois qu'on a l'accélération de ego_vehicle calculée avec la loi de poursuite, j'ai considéré deux facteurs humains qui modifiaient un peu l'accélération:
   * le seuil de perception (fonction *perception_threshold*) : j'ai considéré que le conducteur humain ne pouvait pas remarquer une différence infime d'accélération. Donc si l'accélération de ego_vehicle au pas de temps précédent est trop proche de celle calculée par la loi HDM, le conducteur va garder l'accélération précédente.
   * l'erreur de contrôle (fonction *a_bruit*) : j'ai considéré qu'étant donné une accélération désirée, l'être humain ne pourra jamais appliquer un contrôle parfait sur le véhicule permettant d'atteindre cette accélération. J'ajoute donc un bruit à l'accélération.
+  
 L'algorithme ajoute une autre contrainte à l'accélération calculée qui est une contrainte physique du véhicule. Cette contrainte (calculée par la fonction *a_jerk*) exprime le fait que le véhicule a une dérivée de l'accélération bornée (i.e. ne peut pas avoir une différence d'accélération trop importante en un pas de temps).
 Tout ceci nous donne l'accélération finale de ego_vehicle à l'instant t.
 Ensuite, l'algorithme calcule la vitesse et la position au temps t grâce à l'état du véhicule à l'instant t-tp (avec les fonctions *vitesse* et *position*).
@@ -52,7 +53,7 @@ Enfin l'algorithme mets à jour la table des trajectoires et passe au pas de tem
 
 ## Commentaire
 
-Si vous avez bien suivi la structure de l'algorithme, bien que je présente d'abord le changement de voie puis le calcul de l'accélération, dans l'algorithme les calculs d'accélération se font d'abord parce que ceux-ci sont nécessaires pour déterminer la nouvelle voie.  
+Si vous avez bien suivi la structure de l'algorithme, bien que je présente d'abord le changement de voie puis le calcul de l'accélération, dans l'algorithme les calculs des accélérations se font d'abord parce que ceux-ci sont nécessaires pour déterminer la nouvelle voie. Une fois qu'on a la nouvelle voie on attribue à ego_vehicle l'accélération déjà calculée précedemment dans cette voie. 
 
 # Description des variables
 

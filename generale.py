@@ -191,7 +191,7 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
                 a=Ae[rang_max] # on a la nouvelle accélération (calculée précédemment)
 
 ###### une fois qu'on a la nouvelle voie, on majore l'acceleration par l'impact du seuil de perception (HD n'est pas capable de percevoir un changement infime dans l'accélération)                
-       a=state.perception_threshold(a_prece,a)
+        a=state.perception_threshold(a_prece,a,cv)
                 
 ####### on ajoute ensuite du bruit à l'accélération (dû à l'erreur de contrôle de la part de HD)
         a_fin=state.a_bruit(a,cv)

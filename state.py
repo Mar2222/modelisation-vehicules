@@ -139,3 +139,14 @@ def a_bruit(a,cv):
         a=a*(a_b[0]+1)
         return a
     
+"""
+fonction permettant de prendre en compte le jerk
+"""
+def a_jerk(a_precedent, a, tp):
+  J=1.5*tp
+  if abs(a-a_precedent)>J:
+    a=a_precedent + np.sign(a-a_precedent)*J
+    return a
+  else:
+    return a
+

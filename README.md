@@ -21,23 +21,29 @@ Pour déterminer la nouvelle voie de ego_vehicle, l'algorithme va tout d'abord r
 
 ### Changement de voie : Safety criterion
 
-L'algorithme va ensuite regarder dans chaque voie possible le critère de sécurité. Pour qu'une voie soit sûre il faut que les accélérations, de ego_vehicle et de son véhicule follower (trouvé à l'aide de la fonction *following_vehicle*) dans cette voie, soient supérieures à une décélération limite (bsafe). Si une des accélérations est inférieure à bsafe ça veut dire que, si ego_vehicle se trouvait dans cette voie, un des deux véhicule devrait freiner trop brusquement pour éviter une collision et donc que la voie est dangereuse. Les accélérations des véhicules dans les différentes voies sont calculées à l'aide de la loi de poursuite HDM. Une fois qu'on a regardé la "dangerosité" de chaque voie, il y a trois cas possibles: 
+L'algorithme va ensuite regarder dans chaque voie possible le critère de sécurité. Pour qu'une voie soit sûre il faut que les accélérations, de ego_vehicle et de son véhicule follower (trouvé à l'aide de la fonction *following_vehicle*) dans cette voie, soient supérieures à une décélération limite (bsafe). Si une des accélérations est inférieure à bsafe ça veut dire que, si ego_vehicle se trouvait dans cette voie, un des deux véhicule devrait freiner trop brusquement pour éviter une collision et donc que la voie est dangereuse. Les accélérations des véhicules dans les différentes voies sont calculées à l'aide de la loi de poursuite HDM. 
+
+Une fois qu'on a regardé la "dangerosité" de chaque voie, il y a trois cas possibles: 
   * Premier cas (cas extrèmement rare): toutes les voies sont dangereuses. Dans ce cas, j'ai décidé de différencier le comportement du véhicule autonome de celui du conducteur humain. J'ai considéré qu'un conducteur humain n'aurait pas le temps de réfléchir dans ce cas et, par reflexe, braquerait en restant dans sa voie. Sa nouvelle voie est donc sa voie actuelle. J'ai considéré en revanche qu'un véhicule autonome comparerait les "niveaux de dangerosité" et irait dans la voie la moins dangereuse. Dans ce cas, une fois qu'on a déterminé la nouvelle voie, on passe au calcule de l'accélération de ego_vehicle d'après la loi HDM.
   * Deuxième cas (cas rare): une seule voie est sûre. Dans ce cas cette voie devient la nouvelle voie de ego_vehicle et on passe directement au calcul de son accélération.
   * Troisième cas (cas le plus courant): il y a plusieurs voies sûres. Pour choisir la nouvelle voie, on va déterminer la voie présentant le plus "grand gain" avec le critère d'utilité (utility criterion).
 
 ### Changement de voie : Utility criterion
 
-Pour déterminer la nouvelle voie parmi les voies sûres, on va regarder l'utilité marginale de chaque voie possible. Ce modèle peut se comprendre de la manière suivante : un véhicule va changer de voie si il "gagne" plus qu'en restant dans la voie actuelle. L'utilité marginale représente la différence entre les gains de la voie actuelle et de la voie considérée. J'ai considéré que cette utilité marginale était égale à : (l'accélération de ego_vehicle dans la voie cosidérée) - (l'accélération de véhicule dans la voie actuelle) - (les contraintes liées au changement de voie). Le calcul des accélération se fait encore une fois à l'aide de la loi de poursuite HDM. Pour les contraintes liées au changement de voie, j'ai choisi de considéré les éléments suivants (attention les "contraintes" peuvent être positives ou négatives):
+Pour déterminer la nouvelle voie parmi les voies sûres, on va regarder l'utilité marginale de chaque voie possible. Ce modèle peut se comprendre de la manière suivante : un véhicule va changer de voie si il "gagne" plus qu'en restant dans la voie actuelle. L'utilité marginale représente la différence entre les gains de la voie actuelle et de la voie considérée. J'ai considéré que cette utilité marginale était égale à : (l'accélération de ego_vehicle dans la voie cosidérée) - (l'accélération de véhicule dans la voie actuelle) - (les contraintes liées au changement de voie). Le calcul des accélération se fait encore une fois à l'aide de la loi de poursuite HDM.
+
+Pour les contraintes liées au changement de voie, j'ai choisi de considéré les éléments suivants (attention les "contraintes" peuvent être positives ou négatives):
   * courtoisie (calculé avec *utility_courtoisie*): un véhicule regardera (plus ou moins, en fonction de son coefficient de courtoisie) si changer de voie fera trop ralentir les autres véhicules dans le réseaux
   * les règles de dépassement (i.e en Europe on ne peut pas doubler par la droite) (calculé avec *utility_overtaking*) : un véhicule essaiera (plus ou moins, en focntion de son coefficient de respect du code de la route) de respecter cette règle de dépassement
   * la présence d'un poids lourd/bus comme véhicule leader (calculé avec *utility_truck*) : j'ai considéré qu'un véhicule autonome ne se préoccupera pas du type de véhicule de son véhicule leader. En revanche, j'ai considéré qu'un conducteur humain préférera avoir un véhicule léger devant lui pour avoir une meilleure visibilité.
   * la distance à un tournant obligatoire (calculé par *utility_turn*) : à l'approche d'un tournant obligatoire, le véhicule va essayer de plus en plus de se placer sur la voie lui permettant de tourner/de changer de route/de prendre la sortie qu'il souhaite et va éviter les voies qui l'éloigne de ce tournant. J'ai considéré que le véhicule autonome pouvait prendre en compte le tournant un peu plus tôt que le conducteur humain.
+  
 Une fois qu'on a les utilités marginales de chaque voie (l'utilité marginale de la voie actuelle étant 0), on choisit l'utilité marginale maximale qui nous donne donc la nouvelle voie de ego_vehicle.
 
 ## Loi de poursuite HDM
 
 La loi de poursuite considérée est la loi de poursuite HDM. Cette loi de poursuite calcule l'accélération de ego_vehicle à l'aide d'une équation différentielle différée qui prend en compte le temps de réaction de ego_vehicle. Cette loi de poursuite prend aussi en compte l'aggressivité de ego_vehicle (calculée avec la fonction *aggressivity*). Enfin cete loi considère les différents leaders de ego_vehicle. Les leaders de ego_vehicle sont trouvés à l'aide de la fonction *leading_vehicles* et dépendent de la classe du véhicule. Pour l'instant j'ai considéré qu'un véhicule autonome ne pouvait détecter (grâce à sa caméra) que le véhicule juste devant lui alors qu'un conducteur humain peut voir et prendre en compte jusqu'à 3 véhicules leaders. (Dans un prochain temps j'ajouterai la communication V2V et le véhicule autonome pourra prendre en compte plus de véhicules). 
+
 La loi de poursuite HDM utilise les états (position, vitesse) des véhicules (ego_vehicle et véhicules leaders) à l'instant t-Tr et l'aggressivité de ego_vehicule pour déterminer l'accélération au temps t de ego_vehicle.
 
 ## Autres fonctions
@@ -47,8 +53,11 @@ Une fois qu'on a l'accélération de ego_vehicle calculée avec la loi de poursu
   * l'erreur de contrôle (fonction *a_bruit*) : j'ai considéré qu'étant donné une accélération désirée, l'être humain ne pourra jamais appliquer un contrôle parfait sur le véhicule permettant d'atteindre cette accélération. J'ajoute donc un bruit à l'accélération.
   
 L'algorithme ajoute une autre contrainte à l'accélération calculée qui est une contrainte physique du véhicule. Cette contrainte (calculée par la fonction *a_jerk*) exprime le fait que le véhicule a une dérivée de l'accélération bornée (i.e. ne peut pas avoir une différence d'accélération trop importante en un pas de temps).
+
 Tout ceci nous donne l'accélération finale de ego_vehicle à l'instant t.
+
 Ensuite, l'algorithme calcule la vitesse et la position au temps t grâce à l'état du véhicule à l'instant t-tp (avec les fonctions *vitesse* et *position*).
+
 Enfin l'algorithme mets à jour la table des trajectoires et passe au pas de temps t+tp.
 
 ## Commentaire

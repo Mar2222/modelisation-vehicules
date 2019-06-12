@@ -28,7 +28,6 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
     t=t_simu_deb
     tr_bis= (ego_vehicle.iloc[0]['reaction time']//tp)*tp #pour avoir un nombre entier de pas de temps dans tr_bis
     mAg=50 # aggressivité moyenne des véhicules , c'est l'aggressivité que les condcteurs attribuent aux autres véhicules(cf af_sans et af_avec)
-    J=1.5*tp #jerk qui représente la différence d'accélération max entre deux pas de temps
     
     
     while t<t_simu_fin:
@@ -197,8 +196,7 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
         a_fin=state.a_bruit(a,cv)
         
 ###### on majore la nouvelle accélération par le jerk 
-        if abs(a_fin-a_prece)>J:
-            a_fin=a_prece + np.sign(a_fin-a_prece)*J
+        a_fin=state.a_jerk(a_prece,a_fin,tp)
         
             
 ###### on obtient ensuite les nouvelles variables d'état de ego_vehicle           

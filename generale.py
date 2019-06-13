@@ -156,9 +156,9 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
                     xl1=10000
                     tv1='VL'
                 else:   # si il y avait effectivement un véhicule leader sur la voie de ego_vehicle     
-                    xl1=trajectories[(trajectories['vehicle']==l1)&(trajectories['time']==round(t,1))]
+                    xl1=trajectories[(trajectories['vehicle']==l1[0])&(trajectories['time']==round(t,1))]
                     xl1=xl1.iloc[0]['position']
-                    veh1=vehicles[vehicles['vehicle']==l1]
+                    veh1=vehicles[vehicles['vehicle']==l1[0]]
                     tv1=veh1.iloc[0]['type vehicule']
                     
                 ### on va calculer pour chaque voie la fonction d'utilité    
@@ -170,9 +170,9 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
                         lane2=lane
                         tv2='VL' 
                     else:
-                        xl2=trajectories[(trajectories['vehicle']==l2)&(trajectories['time']==round(t,1))]
+                        xl2=trajectories[(trajectories['vehicle']==l2[0])&(trajectories['time']==round(t,1))]
                         xl2=xl2.iloc[0]['position']
-                        veh2=vehicles[vehicles['vehicle']==l2]
+                        veh2=vehicles[vehicles['vehicle']==l2[0]]
                         lane2=veh2.iloc[0]['lane']
                         tv2=veh2.iloc[0]['type vehicule']
                         

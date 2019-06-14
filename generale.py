@@ -88,8 +88,8 @@ def general(ego_vehicle, Network, vehicles, t_simu_deb, t_simu_fin,tp, trajector
                     af_sans=0
                     af_avec=0
                 else: #si il y a un vehicule follower, on va calculer les accélérations des véhicules followers avec et sans la présence de ego_vehicle dans la voie
-                    af_sans=state.HDM(vehicles[vehicles['vehicle']==follow],leads,Network, trajectories, t-tr_bis, mAg)# (dans la loi HDM on ne considère que l'impact d'un leader parce qu'on va dire que mon conducteur ne va pas anticiper avec plusieurs véhicules pour changer de voie)
-                    af_avec=state.HDM(vehicles[vehicles['vehicle']==follow],[ID_vehicle], Network,trajectories, t-tr_bis, mAg) #le leader de follower devient ego_vehicle quand ego_vehicle est dans la voie
+                    af_sans=state.HDM(vehicles[vehicles['vehicle']==follow[0]],leads,Network, trajectories, t-tr_bis, mAg)# (dans la loi HDM on ne considère que l'impact d'un leader parce qu'on va dire que mon conducteur ne va pas anticiper avec plusieurs véhicules pour changer de voie)
+                    af_avec=state.HDM(vehicles[vehicles['vehicle']==follow[0]],[ID_vehicle], Network,trajectories, t-tr_bis, mAg) #le leader de follower devient ego_vehicle quand ego_vehicle est dans la voie
                 
                 #### on calcule ensuite l'accélération de ego_vehicle dans la voie considérée
                 ae=state.HDM(ego_vehicle,leads, Network, trajectories, t-tr_bis, Ag)
